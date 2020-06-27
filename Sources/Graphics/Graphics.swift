@@ -4,8 +4,8 @@
 
 import Foundation
 
-class Graphics {
-    private class func _octant0(xStart: Int, yStart: Int, deltaX: Int, deltaY: Int, direction: Int, _ plotDot: (Int, Int) -> Void) {
+struct Graphics {
+    private static func _octant0(xStart: Int, yStart: Int, deltaX: Int, deltaY: Int, direction: Int, _ plotDot: (Int, Int) -> Void) {
         let deltaYx2 = deltaY * 2
         let deltaYx2MinusDeltaXx2 = deltaYx2 - (deltaX * 2)
 
@@ -29,7 +29,7 @@ class Graphics {
         }
     }
 
-    private class func _octant1(xStart: Int, yStart: Int, deltaX: Int, deltaY: Int, direction: Int, _ plotDot: (Int, Int) -> Void) {
+    private static func _octant1(xStart: Int, yStart: Int, deltaX: Int, deltaY: Int, direction: Int, _ plotDot: (Int, Int) -> Void) {
         let deltaXx2 = deltaX * 2
         let deltaXx2MinusDeltaYx2 = deltaXx2 - (deltaY * 2)
 
@@ -53,7 +53,7 @@ class Graphics {
         }
     }
 
-    private class func _plotLine(xStart: Int, yStart: Int, xEnd: Int, yEnd: Int, _ plotDot: (Int, Int) -> Void) {
+    private static func _plotLine(xStart: Int, yStart: Int, xEnd: Int, yEnd: Int, _ plotDot: (Int, Int) -> Void) {
         let deltaX = xEnd - xStart
         let deltaY = yEnd - yStart
 
@@ -73,7 +73,7 @@ class Graphics {
         }
     }
 
-    private class func _plotLineHorizontal(xStart: Int, xEnd: Int, y: Int, _ plotDot: (Int, Int) -> Void) {
+    private static func _plotLineHorizontal(xStart: Int, xEnd: Int, y: Int, _ plotDot: (Int, Int) -> Void) {
         let bump = xStart > xEnd ? -1 : 1
         var x = xStart
         while x < xEnd {
@@ -82,7 +82,7 @@ class Graphics {
         }
     }
 
-    private class func _plotLineVertical(yStart: Int, yEnd: Int, x: Int, _ plotDot: (Int, Int) -> Void) {
+    private static func _plotLineVertical(yStart: Int, yEnd: Int, x: Int, _ plotDot: (Int, Int) -> Void) {
         let bump = yStart > yEnd ? -1 : 1
         var y = yStart
         while y < yEnd {
@@ -90,7 +90,7 @@ class Graphics {
             y += bump
         }
     }
-    private class func _plotLineDiagonal(xStart: Int, yStart: Int, xEnd: Int, yEnd: Int, _ plotDot: (Int, Int) -> Void) {
+    private static func _plotLineDiagonal(xStart: Int, yStart: Int, xEnd: Int, yEnd: Int, _ plotDot: (Int, Int) -> Void) {
         let dX = xStart > xEnd ? -1 : 1
         let dY = yStart > yEnd ? -1 : 1
 
@@ -103,7 +103,7 @@ class Graphics {
             y += dY
         }
     }
-    class func plotLine(xStart: Int, yStart: Int, xEnd: Int, yEnd: Int, _ plotDot: (Int, Int) -> Void) {
+    static func plotLine(xStart: Int, yStart: Int, xEnd: Int, yEnd: Int, _ plotDot: (Int, Int) -> Void) {
         if abs(xEnd - xStart) == abs(yEnd - yStart) {
             _plotLineDiagonal(xStart: xStart, yStart: yStart, xEnd: xEnd, yEnd: yEnd, plotDot)
         } else if yStart == yEnd {
@@ -115,5 +115,38 @@ class Graphics {
         } else {
             _plotLine(xStart: xEnd, yStart: yEnd, xEnd: xStart, yEnd: yStart, plotDot)
         }
+    }
+}
+
+extension Graphics {
+    static func _plotCircle(xCenter: Int, yCenter: Int, radius: Int, width: Int = 1, _ plotDot: (Int, Int) -> Void) {
+        var o: Int = width / 2 - width
+        for i in 0..<width {
+            _plotCircle(xCenter: xCenter, yCenter: yCenter, radius: radius + i + o, plotDot)
+        }
+    }
+    static func plotCircle(xCenter: Int, yCenter: Int, radius: Int, _ plotDot: (Int, Int) -> Void) {
+        var majorAxis = 0
+        var minorAxis = radius
+        var distance = radius * radius
+        var minorAxisThreshold = minorAxis * minorAxis - minorAxis
+        repeat {
+            plotDot(xCenter + majorAxis, yCenter - minorAxis)
+            plotDot(xCenter - majorAxis, yCenter - minorAxis)
+            plotDot(xCenter + majorAxis, yCenter + minorAxis)
+            plotDot(xCenter - majorAxis, yCenter + minorAxis)
+
+            plotDot(xCenter + minorAxis, yCenter - majorAxis)
+            plotDot(xCenter - minorAxis, yCenter - majorAxis)
+            plotDot(xCenter + minorAxis, yCenter + majorAxis)
+            plotDot(xCenter - minorAxis, yCenter + majorAxis)
+
+            majorAxis += 1
+            distance -= majorAxis + majorAxis + 1
+            if distance <= minorAxisThreshold {
+                minorAxis -= 1
+                minorAxisThreshold -= minorAxis + minorAxis
+            }
+        } while majorAxis <= minorAxis
     }
 }

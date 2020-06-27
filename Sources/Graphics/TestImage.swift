@@ -58,7 +58,7 @@ class TestImage {
     func drawHorizontals(steps: Int, pixel: RGBA<UInt8>) {
         for i in stride(from: 0, to: image.height + 1, by: steps) {
             Graphics.plotLine(xStart: 0, yStart: i, xEnd: image.width, yEnd: i) { (x, y) in
-                plotPoint(x: x, y: y, image: &image, pixel: RGBA.red)
+                plotPoint(x: x, y: y, image: &image, pixel: pixel)
             }
         }
     }
@@ -71,6 +71,18 @@ class TestImage {
         }
         for i in stride(from: 0, to: image.width + 1, by: steps) {
             Graphics.plotLine(xStart: i, yStart: 0, xEnd: image.width - 1 - i, yEnd: image.height - 1) { (x, y) in
+                plotPoint(x: x, y: y, image: &image, pixel: pixel)
+            }
+        }
+    }
+
+    func addCircles(steps: Int, pixel: RGBA<UInt8>) {
+        let dim = min(image.height, image.width)
+        let xCenter = image.width / 2
+        let yCenter = image.height / 2
+
+        for radius in stride(from: steps, to: dim / 2, by: steps) {
+            Graphics.plotCircle(xCenter: xCenter, yCenter: yCenter, radius: radius) { x, y in
                 plotPoint(x: x, y: y, image: &image, pixel: pixel)
             }
         }
